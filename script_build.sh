@@ -9,7 +9,7 @@
 # Some User's Details. Please fill it with your own details.
 
 # Replace "legacy" with your own SSH Username in lowercase
-username=legacy
+username=kibria
 
 # Colors makes things beautiful
 export TERM=xterm
@@ -20,47 +20,12 @@ export TERM=xterm
     cya=$(tput setaf 6)             #  cyan
     txtrst=$(tput sgr0)             #  Reset
 
-# CCACHE UMMM!!! Cooks my builds fast
-
-if [ "$use_ccache" = "yes" ];
-then
-echo -e ${blu}"CCACHE is enabled for this build"${txtrst}
-export CCACHE_EXEC=$(which ccache)
-export USE_CCACHE=1
-export CCACHE_DIR=/home/ccache/$username
-ccache -M 100G
-fi
-
-if [ "$use_ccache" = "clean" ];
-then
-export CCACHE_EXEC=$(which ccache)
-export CCACHE_DIR=/home/ccache/$username
-ccache -C
-export USE_CCACHE=1
-ccache -M 100G
-wait
-echo -e ${grn}"CCACHE Cleared"${txtrst};
-fi
 
 # Prepare Environment and Device
 source build/envsetup.sh
-lunch "$lunch_command"_"$device_codename"-"$build_type"
+lunch evolution_violet-userdebug
 
-# Its Clean Time
-if [ "$make_clean" = "yes" ];
-then
-make clean && make clobber
-wait
-echo -e ${cya}"OUT dir from your repo deleted"${txtrst};
-fi
-
-# Its Images Clean Time
-if [ "$make_clean" = "installclean" ];
-then
-make installclean
-wait
-echo -e ${cya}"Images deleted from OUT dir"${txtrst};
-fi
+echo -e ${cya}"starting build process"${txtrst};
 
 # Build ROM
-make "$target_command" -j"$jobs"
+mka evolution -j$(nproc --all)
